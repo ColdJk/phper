@@ -22,14 +22,8 @@ ENV DEBIAN_FRONTEND noninteractive
 USER root
 
 ###########################################################################
-# phper non-root user:
+# change apt source
 ###########################################################################
-
-# Add a non-root user to prevent files being created with root permissions on host machine.
-ARG PUID=1000
-ENV PUID ${PUID}
-ARG PGID=1000
-ENV PGID ${PGID}
 
 ARG CHANGE_SOURCE=false
 ARG UBUNTU_SOURCE
@@ -40,6 +34,16 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
     /bin/sh -c /tmp/sources.sh && \
     rm -rf /tmp/sources.sh \
 ;fi
+
+###########################################################################
+# phper non-root user:
+###########################################################################
+
+# Add a non-root user to prevent files being created with root permissions on host machine.
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
 
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
@@ -56,11 +60,13 @@ RUN set -xe; \
       #--------------------------------------------------------------------------
       #
       # Mandatory Software's such as ("php-cli", "git", "vim", ....) are
-      # installed on the base image 'phper/workspace' image. If you want
+      # installed on the base image 'Laradock/workspace' image. If you want
       # to add more Software's or remove existing one, you need to edit the
       # base image (https://github.com/Laradock/workspace).
       #
-      # next lines are here because there is no auto build on dockerhub see https://github.com/phper/phper/pull/1903#issuecomment-463142846
+      # next lines are here because there is no auto build on dockerhub see https://github.com/laradock/laradock/pull/1903#issuecomment-463142846
+      net-tools \
+      wget \
       libzip-dev zip unzip \
       # Install the zip extension
       php${DOCKER_PHP_VERSION}-zip \
@@ -173,6 +179,11 @@ USER phper
 RUN echo "" >> ~/.bashrc && \
     echo 'export PATH="/var/www/default/vendor/bin:$PATH"' >> ~/.bashrc
 
+
+
+
+## ===================== tools =========================
+
 ###########################################################################
 # Crontab
 ###########################################################################
@@ -183,54 +194,11 @@ COPY ./crontab /etc/cron.d
 
 RUN chmod -R 644 /etc/cron.d
 
-###########################################################################
-# PYTHON:
-###########################################################################
 
-USER root
-
-COPY ./pip.ini /tmp/pip.ini
-
-ARG INSTALL_PYTHON=false
-
-RUN if [ ${INSTALL_PYTHON} = true ]; then \
-  apt-get -y install python python-pip python-dev build-essential  \
-#   && python -m pip install --upgrade pip  \
-  && python -m pip install virtualenv \
-  && mkdir ~/pip && mv -f /tmp/pip.ini ~/pip/pip.ini && rm -rf /tmp/pip.ini \
-;fi
+## ================  php extension  ==================
 
 ###########################################################################
-# SUPERVISOR:
-###########################################################################
-USER root
-
-ARG INSTALL_SUPERVISOR=false
-
-RUN if [ ${INSTALL_SUPERVISOR} = true ]; then \
-    if [ ${INSTALL_PYTHON} = true ]; then \
-    python -m pip install --upgrade supervisor && \
-    echo_supervisord_conf > /etc/supervisord.conf && \
-    sed -i 's/\;\[include\]/\[include\]/g' /etc/supervisord.conf && \
-    sed -i 's/\;files\s.*/files = supervisord.d\/*.conf/g' /etc/supervisord.conf \
-  ;fi \
-;fi
-
-###########################################################################
-# ping:
-###########################################################################
-
-USER root
-
-ARG INSTALL_PING=false
-
-RUN if [ ${INSTALL_PING} = true ]; then \
-    apt-get update -yqq && \
-    apt-get -y install inetutils-ping \
-;fi
-
-###########################################################################
-# SSH2:
+# SSH2: php extension
 ###########################################################################
 
 USER root
@@ -240,55 +208,6 @@ ARG INSTALL_SSH2=false
 RUN if [ ${INSTALL_SSH2} = true ]; then \
   # Install the PHP SSH2 extension
   apt-get -y install libssh2-1-dev php${DOCKER_PHP_VERSION}-ssh2 \
-;fi
-
-###########################################################################
-# ssh:
-###########################################################################
-
-ARG INSTALL_WORKSPACE_SSH=false
-
-COPY rsa/insecure_id_rsa /tmp/id_rsa
-COPY rsa/insecure_id_rsa.pub /tmp/id_rsa.pub
-
-RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
-    rm -f /etc/service/sshd/down && \
-    cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys \
-        && cat /tmp/id_rsa.pub >> /root/.ssh/id_rsa.pub \
-        && cat /tmp/id_rsa >> /root/.ssh/id_rsa \
-        && rm -f /tmp/id_rsa* \
-        && chmod 644 /root/.ssh/authorized_keys /root/.ssh/id_rsa.pub \
-    && chmod 400 /root/.ssh/id_rsa \
-    && cp -rf /root/.ssh /home/phper \
-    && chown -R phper:phper /home/phper/.ssh \
-;fi
-
-###########################################################################
-# Linuxbrew:
-###########################################################################
-
-USER root
-
-ARG INSTALL_LINUXBREW=false
-
-RUN if [ ${INSTALL_LINUXBREW} = true ]; then \
-    # Preparation
-    apt-get upgrade -y && \
-    apt-get install -y build-essential make cmake scons curl git \
-      ruby autoconf automake autoconf-archive \
-      gettext libtool flex bison \
-      libbz2-dev libcurl4-openssl-dev \
-      libexpat-dev libncurses-dev && \
-    # Install the Linuxbrew
-    git clone --depth=1 https://github.com/Homebrew/linuxbrew.git ~/.linuxbrew && \
-    echo "" >> ~/.bashrc && \
-    echo 'export PKG_CONFIG_PATH"=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc && \
-    # Setup linuxbrew
-    echo 'export LINUXBREWHOME="$HOME/.linuxbrew"' >> ~/.bashrc && \
-    echo 'export PATH="$LINUXBREWHOME/bin:$PATH"' >> ~/.bashrc && \
-    echo 'export MANPATH="$LINUXBREWHOME/man:$MANPATH"' >> ~/.bashrc && \
-    echo 'export PKG_CONFIG_PATH="$LINUXBREWHOME/lib64/pkgconfig:$LINUXBREWHOME/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc && \
-    echo 'export LD_LIBRARY_PATH="$LINUXBREWHOME/lib64:$LINUXBREWHOME/lib:$LD_LIBRARY_PATH"' >> ~/.bashrc \
 ;fi
 
 ###########################################################################
@@ -303,9 +222,9 @@ ARG INSTALL_SWOOLE=false
 RUN  if [ ${INSTALL_SWOOLE} = true ]; then \
     cd / && \
     rm -rf ./swoole-src && \
-    curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/v4.5.10.tar.gz -L && \
+    curl -o ./tmp/swoole.tar.gz https://gitee.com/swoole/swoole/repository/archive/v4.5.11?format=tar.gz -L && \
     tar zxvf ./tmp/swoole.tar.gz && \
-    mv swoole-src* swoole-src && \
+    mv swoole* swoole-src && \
     cd swoole-src && \
     phpize && \
     ./configure \
@@ -329,7 +248,7 @@ ARG INSTALL_PHPREDIS=false
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     apt-get update -yqq && \
-    apt-get install -yqq php-redis \
+    apt-get install -yqq php${DOCKER_PHP_VERSION}-redis \
 ;fi
 
 ###########################################################################
@@ -400,6 +319,12 @@ RUN if [ ${INSTALL_SOAP} = true ]; then \
   # Install the PHP SOAP extension
   apt-get -y install libxml2-dev php${DOCKER_PHP_VERSION}-soap \
 ;fi
+
+
+
+
+
+## =============  other software  =================
 
 ###########################################################################
 # Laravel Installer:
@@ -560,6 +485,121 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
 
 # Add PATH for YARN
 ENV PATH $PATH:/home/phper/.yarn/bin
+
+###########################################################################
+# PYTHON:
+###########################################################################
+
+USER root
+
+COPY ./pip.ini /tmp/pip.ini
+
+ARG INSTALL_PYTHON=false
+
+RUN if [ ${INSTALL_PYTHON} = true ]; then \
+  apt-get -y install python python-dev build-essential  \
+  # 部分 `apt` 镜像源已经没有2版本的 `python-pip` 包，所以改为下面方式安装
+  && curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py && python get-pip.py && rm get-pip.py \
+  && python -m pip install --upgrade pip  \
+  && python -m pip install virtualenv \
+  && mkdir ~/pip && mv -f /tmp/pip.ini ~/pip/pip.ini && rm -rf /tmp/pip.ini \
+;fi
+
+###########################################################################
+# POWERLINE:
+###########################################################################
+
+USER root
+ARG INSTALL_POWERLINE=false
+
+RUN if [ ${INSTALL_POWERLINE} = true ]; then \
+    if [ ${INSTALL_PYTHON} = true ]; then \
+    python -m pip install --upgrade powerline-status && \
+    echo "" >> /etc/bash.bashrc && \
+#    echo ". /home/user/.local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh" >> /etc/bash.bashrc \
+    echo ". /usr/local/lib/python2.7/dist-packages/powerline/bindings/bash/powerline.sh" >> /etc/bash.bashrc \
+  ;fi \
+;fi
+
+###########################################################################
+# SUPERVISOR:
+###########################################################################
+USER root
+
+ARG INSTALL_SUPERVISOR=false
+
+RUN if [ ${INSTALL_SUPERVISOR} = true ]; then \
+    if [ ${INSTALL_PYTHON} = true ]; then \
+    python -m pip install --upgrade supervisor && \
+    echo_supervisord_conf > /etc/supervisord.conf && \
+    sed -i 's/\;\[include\]/\[include\]/g' /etc/supervisord.conf && \
+    sed -i 's/\;files\s.*/files = supervisord.d\/*.conf/g' /etc/supervisord.conf \
+  ;fi \
+;fi
+
+###########################################################################
+# ping:
+###########################################################################
+
+USER root
+
+ARG INSTALL_PING=false
+
+RUN if [ ${INSTALL_PING} = true ]; then \
+    apt-get update -yqq && \
+    apt-get -y install inetutils-ping \
+;fi
+
+
+###########################################################################
+# ssh:
+###########################################################################
+
+ARG INSTALL_WORKSPACE_SSH=false
+
+COPY rsa/insecure_id_rsa /tmp/id_rsa
+COPY rsa/insecure_id_rsa.pub /tmp/id_rsa.pub
+
+RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
+    rm -f /etc/service/sshd/down && \
+    cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys \
+        && cat /tmp/id_rsa.pub >> /root/.ssh/id_rsa.pub \
+        && cat /tmp/id_rsa >> /root/.ssh/id_rsa \
+        && rm -f /tmp/id_rsa* \
+        && chmod 644 /root/.ssh/authorized_keys /root/.ssh/id_rsa.pub \
+    && chmod 400 /root/.ssh/id_rsa \
+    && cp -rf /root/.ssh /home/phper \
+    && chown -R phper:phper /home/phper/.ssh \
+;fi
+
+###########################################################################
+# Linuxbrew:
+###########################################################################
+
+USER root
+
+ARG INSTALL_LINUXBREW=false
+
+RUN if [ ${INSTALL_LINUXBREW} = true ]; then \
+    # Preparation
+    apt-get upgrade -y && \
+    apt-get install -y build-essential make cmake scons curl git \
+      ruby autoconf automake autoconf-archive \
+      gettext libtool flex bison \
+      libbz2-dev libcurl4-openssl-dev \
+      libexpat-dev libncurses-dev && \
+    # Install the Linuxbrew
+    git clone --depth=1 https://github.com/Homebrew/linuxbrew.git ~/.linuxbrew && \
+    echo "" >> ~/.bashrc && \
+    echo 'export PKG_CONFIG_PATH"=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc && \
+    # Setup linuxbrew
+    echo 'export LINUXBREWHOME="$HOME/.linuxbrew"' >> ~/.bashrc && \
+    echo 'export PATH="$LINUXBREWHOME/bin:$PATH"' >> ~/.bashrc && \
+    echo 'export MANPATH="$LINUXBREWHOME/man:$MANPATH"' >> ~/.bashrc && \
+    echo 'export PKG_CONFIG_PATH="$LINUXBREWHOME/lib64/pkgconfig:$LINUXBREWHOME/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc && \
+    echo 'export LD_LIBRARY_PATH="$LINUXBREWHOME/lib64:$LINUXBREWHOME/lib:$LD_LIBRARY_PATH"' >> ~/.bashrc \
+;fi
+
 
 
 ###########################################################################

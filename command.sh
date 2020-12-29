@@ -34,7 +34,10 @@ display_options () {
     print_style "   sh [service]" "info"; printf "\t\t Exec Docker Compose with sh.\n"
     print_style "   l" "info"; printf "\t\t\t Up basic containers.\n"
     print_style "   elk" "info"; printf "\t\t\t Up elk containers.\n"
+    print_style "   um" "info"; printf "\t\t\t Up mysql containers.\n"
     print_style "   sm" "info"; printf "\t\t\t Stop mysql containers.\n"
+    print_style "   uw" "info"; printf "\t\t\t Up workspace containers.\n"
+    print_style "   sw" "info"; printf "\t\t\t Stop workspace containers.\n"
     print_style "   user" "info"; printf "\t\t\t Open bash on the workspace with user phper.\n"
     print_style "   root" "info"; printf "\t\t\t Open bash on the workspace with root.\n"
 }
@@ -108,9 +111,21 @@ elif [ "$1" == "l" ]; then
     print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin redis-webui\n" "info"
     docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin redis-webui
 
+elif [ "$1" == "um" ]; then
+    print_style "Uping mysql container\n" "warning"
+    docker-compose up -d mysql
+
 elif [ "$1" == "sm" ]; then
     print_style "Stoping mysql container\n" "warning"
     docker-compose stop mysql
+
+elif [ "$1" == "uw" ]; then
+    print_style "Uping workspace container\n" "warning"
+    docker-compose up -d workspace
+
+elif [ "$1" == "sw" ]; then
+    print_style "Stoping workspace container\n" "warning"
+    docker-compose stop workspace
 
 else
     print_style "Invalid arguments.\n" "danger"

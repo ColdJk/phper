@@ -256,9 +256,9 @@ RUN  if [ ${INSTALL_SWOOLE} = true ]; then \
     docker-php-ext-install sockets && \
     cd / && \
     rm -rf ./swoole-src && \
-    curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/v4.5.10.tar.gz -L && \
+    curl -o ./tmp/swoole.tar.gz https://gitee.com/swoole/swoole/repository/archive/v4.5.11?format=tar.gz -L && \
     tar zxvf ./tmp/swoole.tar.gz && \
-    mv swoole-src* swoole-src && \
+    mv swoole* swoole-src && \
     cd swoole-src && \
     phpize && \
     ./configure \

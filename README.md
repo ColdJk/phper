@@ -1,4 +1,4 @@
-## dockphp
+## phper_dock
 基于`laradock-11.0 release`简化。加入国内镜像，使build速度加快。
 
 ## 支持的软件 (镜像)
@@ -29,13 +29,13 @@
 
 ## 安装
 
-克隆 `dockphp` 仓库:
+克隆 `phper_dock` 仓库:
 
 在你系统的任意位置（建议在你的工作目录）：
 
 ```bash
-git clone https://github.com/coldjk/dockphp.git
-cd dockphp
+git clone https://github.com/coldjk/phper_dock.git
+cd phper_dock
 cp .env.example .env
 ```
 
@@ -43,7 +43,7 @@ cp .env.example .env
 
 ## 启动
 
-进入到 `dockphp` 目录中
+进入到 `phper_dock` 目录中
 
 例如 Nginx 和 Mysql:
 
@@ -97,9 +97,9 @@ nginx, php-fpm, php-worker, mysql, redis, memcached, elasticsearch, workspace
 
 进入 Workspace 容器, 执行像 (Artisan, Composer, Gulp, ...)等命令
 
-`docker-compose exec -it -u devdock workspace bash`
+`docker-compose exec -it -u phper workspace bash`
 
-增加 --user=devdock (例如 docker-compose exec --user=phper workspace bash) 作为您的主机的用户创建的文件. (你可以从 docker-compose.yml 修改 PUID (User id) 和 PGID (group id) 值 )。
+增加 --user=phper (例如 docker-compose exec --user=phper workspace bash) 作为您的主机的用户创建的文件. (你可以从 docker-compose.yml 修改 PUID (User id) 和 PGID (group id) 值 )。
 
 ## 使用
 
@@ -115,7 +115,7 @@ nginx, php-fpm, php-worker, mysql, redis, memcached, elasticsearch, workspace
 
 `docker ps`
 
-- 你也可以使用以下命令查看当前 `dockphp` 启动的容器
+- 你也可以使用以下命令查看当前 `phper_dock` 启动的容器
 
 `docker-compose ps`
 

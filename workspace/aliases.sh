@@ -20,9 +20,9 @@ else # macOS `ls`
 fi
 
 # List all files colorized in long format
-#alias l="ls -lF ${colorflag}"
+alias l="ls -lF ${colorflag}"
 ### MEGA: I want l and la ti return hisdden files
-alias l="ls -laF ${colorflag}"
+#alias l="ls -laF ${colorflag}"
 
 # List all files colorized in long format, including dot files
 alias la="ls -laF ${colorflag}"
@@ -32,6 +32,25 @@ alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 
 # Always use color output for `ls`
 alias ls="command ls ${colorflag}"
+
+# Commonly Used Aliases
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+alias ~="cd ~" # `cd` is probably faster to type though
+alias -- -="cd -"
+alias home="cd ~"
+
+alias h="history"
+alias j="jobs"
+alias e='exit'
+alias c="clear"
+alias cla="clear && ls -la"
+alias cll="clear && ls -l"
+alias cls="clear && ls"
+alias code="cd /var/www"
+alias ea="vi ~/aliases.sh"
 
 # Commonly Used Aliases
 alias ..="cd .."
@@ -115,6 +134,10 @@ alias gbr="git branch"
 alias gc="git commit"
 alias gck="git checkout"
 
+alias gcm="git commit -m 'ct'"
+alias gup="git pull"
+alias gp="git push origin"
+
 # Create a new directory and enter it
 function mkd() {
     mkdir -p "$@" && cd "$@"
@@ -149,3 +172,29 @@ function fs() {
 		du $arg .[^.]* ./*;
 	fi;
 }
+
+# 杀死所有正在运行的容器.
+alias dockerkillc='docker kill $(docker ps -a -q)'
+# 删除所有已经停止的容器.
+alias dockercleanc='docker rm $(docker ps -a -q)'
+# 删除所有未打标签的镜像.
+alias dockercleani='docker rmi $(docker images -q -f dangling=true)'
+# 删除所有已经停止的容器和未打标签的镜像.
+alias dockerclean='dockercleanc || true && dockercleani'
+
+# hyperf
+alias pycd="cd /var/www/html/pytest"
+alias hycd="cd /var/www/hyperf_service"
+alias hyrun="php ./bin/hyperf.php start"
+alias hy="php ./bin/hyperf.php"
+
+alias hypid="sudo netstat -lntp | grep 9504"
+alias hylog="cd /alidata/log/hyperf_service"
+alias hysupr="sudo supervisorctl restart hyperf_service"
+alias hysups="sudo supervisorctl stop hyperf_service"
+
+alias hyrcd="cd /var/www/ResourceProductService"
+alias hyrpid="sudo netstat -lntp | grep 9506"
+alias hyrlog="cd /alidata/log/resource_service"
+alias hyrsupr="sudo supervisorctl restart resource_service"
+alias hyrsups="sudo supervisorctl stop resource_service"
