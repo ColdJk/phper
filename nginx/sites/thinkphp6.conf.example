@@ -10,7 +10,7 @@ server {
     # ssl_certificate_key /etc/nginx/ssl/default.key;
 
     server_name thinkphp6.test;
-    root /var/www/demo/tp6/public;
+    root /var/www/thinkphp6/public;
     index index.php index.html index.htm;
 
     location / {

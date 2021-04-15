@@ -30,6 +30,6 @@ server {
             log_not_found off;
         }
 
-        error_log /var/log/nginx/typecho_error.log;
-        access_log /var/log/nginx/typecho_access.log;
+        error_log /var/log/nginx/wordpress_error.log;
+        access_log /var/log/nginx/wordpress_access.log;
 }

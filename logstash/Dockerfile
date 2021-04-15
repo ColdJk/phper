@@ -1,4 +1,4 @@
-ARG ELK_VERSION=7.5.1
+ARG ELK_VERSION
 FROM docker.elastic.co/logstash/logstash:${ELK_VERSION}
 
 USER root
@@ -10,3 +10,5 @@ ADD config /usr/share/logstash/config/
 RUN logstash-plugin install logstash-input-jdbc
 RUN logstash-plugin install logstash-input-beats
 
+# 配置文件
+COPY ./config/logstash.yml /usr/share/logstash/config/logstash.yml

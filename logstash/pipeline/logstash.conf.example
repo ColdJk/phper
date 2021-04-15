@@ -1,0 +1,43 @@
+#input {
+#	tcp {
+#		port => 5000
+#	}
+#}
+
+input {
+	file {
+		path => ["/var/www/logs/alidata/site/*.log",
+			"/var/www/logs/alidata/site/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/site/*/*/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/terminal/*/*/*/*/*/*/*/*/*/*.log",
+			"/var/www/logs/alidata/phpfpm/*.log"
+			]
+		type => "siteLog"
+		start_position => "beginning"
+	}
+}
+
+## Add your filters / logstash plugins configuration here
+
+output {
+	elasticsearch {
+		hosts => "elasticsearch:9200"
+		user => "elastic"
+		password => "pft"
+	}
+}
