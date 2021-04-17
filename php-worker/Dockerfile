@@ -17,7 +17,6 @@ RUN apk --update add wget \
   curl \
   git \
   build-base \
-  libmemcached-dev \
   libmcrypt-dev \
   libxml2-dev \
   pcre-dev \
@@ -42,22 +41,32 @@ ENV PGID ${PGID}
 RUN addgroup -g ${PGID} phper && \
     adduser -D -G phper -u ${PUID} phper
 
-# php memcached extension
-RUN if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-      pecl install memcached-2.2.0 mcrypt-1.0.1; \
-    else \
-      pecl install memcached mcrypt-1.0.1; \
-    fi; \
-    docker-php-ext-enable memcached
 
-#Install BZ2:
+## =========== php extension =================
+
+# PHP Memcached EXTENSION:
+ARG INSTALL_MEMCACHED=false
+RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
+  apk --update add libmemcached-dev; \
+  # Install the php memcached extension
+  if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
+    pecl install memcached-2.2.0; \
+  else \
+    pecl install memcached; \
+  fi; \
+  docker-php-ext-enable memcached; \
+  php -m | grep -r 'memcached'; \
+fi
+
+
+#Install BZ2 EXTENSION:
 ARG INSTALL_BZ2=false
 RUN if [ ${INSTALL_BZ2} = true ]; then \
   apk --update add bzip2-dev; \
   docker-php-ext-install bz2; \
 fi
 
-# PHP GnuPG:
+# PHP GnuPG EXTENSION:
 ARG INSTALL_GNUPG=false
 RUN set -eux; if [ ${INSTALL_GNUPG} = true ]; then \
       apk add --no-cache --no-progress --virtual BUILD_DEPS_PHP_GNUPG gpgme-dev; \
@@ -70,7 +79,7 @@ RUN set -eux; if [ ${INSTALL_GNUPG} = true ]; then \
       docker-php-ext-enable gnupg; \
     fi
 
-#Install GD package:
+#Install GD EXTENSION:
 ARG INSTALL_GD=false
 RUN if [ ${INSTALL_GD} = true ]; then \
     apk add --update --no-cache freetype-dev libjpeg-turbo-dev jpeg-dev libpng-dev; \
@@ -82,7 +91,7 @@ RUN if [ ${INSTALL_GD} = true ]; then \
     docker-php-ext-install gd \
 ;fi
 
-#Install ImageMagick:
+#Install ImageMagick EXTENSION:
 ARG INSTALL_IMAGEMAGICK=false
 ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
@@ -109,26 +118,26 @@ RUN set -eux; \
     php -m | grep -q 'imagick'; \
   fi
 
-#Install GMP package:
+#Install GMP EXTENSION:
 ARG INSTALL_GMP=false
 RUN if [ ${INSTALL_GMP} = true ]; then \
    apk add --update --no-cache gmp gmp-dev \
    && docker-php-ext-install gmp \
 ;fi
 
-#Install BCMath package:
+#Install BCMath EXTENSION:
 ARG INSTALL_BCMATH=false
 RUN if [ ${INSTALL_BCMATH} = true ]; then \
     docker-php-ext-install bcmath \
 ;fi
 
-#Install SOAP package:
+#Install SOAP EXTENSION:
 ARG INSTALL_SOAP=false
 RUN if [ ${INSTALL_SOAP} = true ]; then \
     docker-php-ext-install soap \
 ;fi
 
-# Install MongoDB drivers:
+# Install MongoDB EXTENSION:
 ARG INSTALL_MONGO=false
 RUN if [ ${INSTALL_MONGO} = true ]; then \
       if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
@@ -140,7 +149,7 @@ RUN if [ ${INSTALL_MONGO} = true ]; then \
       fi; \
     fi
 
-# PHP OCI8:
+# PHP OCI8 EXTENSION:
 ARG INSTALL_OCI8=false
 ENV LD_LIBRARY_PATH="/usr/local/instantclient"
 ENV ORACLE_HOME="/usr/local/instantclient"
@@ -176,14 +185,14 @@ RUN if [ ${INSTALL_OCI8} = true ] && [ $(php -r "echo PHP_MAJOR_VERSION;") = "7"
           php -m | grep -q 'zip' \
 ;fi
 
-# Install PostgreSQL drivers:
+# Install PostgreSQL drivers EXTENSION:
 ARG INSTALL_PGSQL=false
 RUN if [ ${INSTALL_PGSQL} = true ]; then \
     apk --update add postgresql-dev \
         && docker-php-ext-install pdo_pgsql \
 ;fi
 
-# Install ZipArchive:
+# Install ZipArchive EXTENSION:
 ARG INSTALL_ZIP_ARCHIVE=false
 RUN set -eux; \
   if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
@@ -196,6 +205,9 @@ RUN set -eux; \
     # Install the zip extension
     docker-php-ext-install zip \
 ;fi
+
+
+## ============ tools ====================
 
 # Install MySQL Client:
 ARG INSTALL_MYSQL_CLIENT=false
@@ -235,7 +247,10 @@ RUN if [ ${INSTALL_AUDIOWAVEFORM} = true ]; then \
    && make install \
 ;fi
 
-# Install AMQP:
+
+## =========== php extension =================
+
+# Install AMQP EXTENSION:
 ARG INSTALL_AMQP=false
 RUN if [ ${INSTALL_AMQP} = true ]; then \
     apk --update add -q rabbitmq-c rabbitmq-c-dev && \
@@ -259,7 +274,7 @@ RUN if [ ${INSTALL_GEARMAN} = true ]; then \
     sh -c 'echo "extension=/usr/lib/php7/modules/gearman.so" > /usr/local/etc/php/conf.d/gearman.ini' \
 ;fi
 
-# Install Cassandra drivers:
+# Install Cassandra EXTENSION:
 ARG INSTALL_CASSANDRA=false
 RUN if [ ${INSTALL_CASSANDRA} = true ]; then \
   if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
@@ -282,7 +297,7 @@ RUN if [ ${INSTALL_CASSANDRA} = true ]; then \
   fi \
 ;fi
 
-# Install Phalcon ext
+# Install Phalcon EXTENSION
 ARG INSTALL_PHALCON=false
 ARG PHALCON_VERSION
 ENV PHALCON_VERSION ${PHALCON_VERSION}
@@ -303,12 +318,13 @@ RUN if [ $INSTALL_PHALCON = true ]; then \
     && rm -rf /tmp/cphalcon* \
 ;fi
 
+# ghostscript
 ARG INSTALL_GHOSTSCRIPT=false
 RUN if [ $INSTALL_GHOSTSCRIPT = true ]; then \
     apk --update add ghostscript \
 ;fi
 
-# Install Redis package:
+# Install Redis EXTENSION:
 ARG INSTALL_REDIS=false
 RUN if [ ${INSTALL_REDIS} = true ]; then \
     # Install Redis Extension
@@ -365,7 +381,7 @@ RUN if [ ${INSTALL_IMAP} = true ]; then \
     docker-php-ext-install imap \
 ;fi
 
-# XMLRPC:
+# XMLRPC EXTENSION:
 ARG INSTALL_XMLRPC=false
 RUN if [ ${INSTALL_XMLRPC} = true ]; then \
       if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
