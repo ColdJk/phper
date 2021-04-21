@@ -318,8 +318,8 @@ RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
 ARG INSTALL_MEMCACHED=false
 
 RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
-  apt-get -y install php${LARADOCK_PHP_VERSION}-igbinary \
-  && apt-get -y install php${LARADOCK_PHP_VERSION}-memcached \
+  apt-get -y install php${DOCKER_PHP_VERSION}-igbinary \
+  && apt-get -y install php${DOCKER_PHP_VERSION}-memcached \
 ;fi
 
 ###########################################################################
