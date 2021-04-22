@@ -43,16 +43,19 @@ RUN set -xe; \
 ###########################################################################
 # PHP Essential Extension;
 ###########################################################################
-
 RUN docker-php-ext-install bcmath && \
+    # Mysqli Modifications:
     docker-php-ext-install mysqli && \
+    # Human Language and Character Encoding Support:
     apt-get install -y zlib1g-dev libicu-dev g++ && \
     docker-php-ext-configure intl && \
     docker-php-ext-install intl && \
+    # ImageMagick:
     apt-get install -y libmagickwand-dev imagemagick && \
     pecl install imagick && \
     docker-php-ext-enable imagick && \
     docker-php-ext-install opcache && \
+    # Image optimizers:
     apt-get install -y jpegoptim optipng pngquant gifsicle
 
 #
