@@ -108,8 +108,8 @@ elif [ "$1" == "elk" ]; then
     docker-compose up -d elasticsearch kibana logstash
 
 elif [ "$1" == "l" ]; then
-    print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin redis-webui\n" "info"
-    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin redis-webui
+    print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
+    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
 
 elif [ "$1" == "um" ]; then
     print_style "Uping mysql container\n" "warning"

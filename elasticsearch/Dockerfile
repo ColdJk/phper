@@ -10,6 +10,6 @@ FROM docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
 RUN mkdir /usr/share/elasticsearch/config/analysis && touch /usr/share/elasticsearch/config/analysis/synonyms.txt
 
 # 配置文件
-COPY ./config/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+#COPY ./config/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
 
 EXPOSE 9200 9300
