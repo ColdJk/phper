@@ -95,6 +95,8 @@ elif [ "$1" == "log" ]; then
     print_style "Print logs\n" "info"
     docker-compose logs $1
 
+
+# 容器操作
 elif [ "$1" == "user" ]; then
     print_style "Execing workspace with phper user\n" "info"
     docker-compose exec --user=phper workspace bash
@@ -102,7 +104,24 @@ elif [ "$1" == "user" ]; then
 elif [ "$1" == "root" ]; then
     print_style "Execing workspace with root user\n" "info"
     docker-compose exec workspace bash
+elif [ "$1" == "mu" ]; then
+    print_style "Uping mysql container\n" "warning"
+    docker-compose up -d mysql
 
+elif [ "$1" == "ms" ]; then
+    print_style "Stoping mysql container\n" "warning"
+    docker-compose stop mysql
+
+elif [ "$1" == "wu" ]; then
+    print_style "Uping workspace container\n" "warning"
+    docker-compose up -d workspace
+
+elif [ "$1" == "ws" ]; then
+    print_style "Stoping workspace container\n" "warning"
+    docker-compose stop workspace
+
+
+# 套餐容器
 elif [ "$1" == "elk" ]; then
     print_style "Uping elk containers\n" "info"
     docker-compose up -d elasticsearch kibana logstash
@@ -114,22 +133,6 @@ elif [ "$1" == "l" ]; then
 elif [ "$1" == "ka" ]; then
     print_style "Uping zookeeper kafka\n" "info"
     docker-compose up -d zookeeper kafka
-
-elif [ "$1" == "um" ]; then
-    print_style "Uping mysql container\n" "warning"
-    docker-compose up -d mysql
-
-elif [ "$1" == "sm" ]; then
-    print_style "Stoping mysql container\n" "warning"
-    docker-compose stop mysql
-
-elif [ "$1" == "uw" ]; then
-    print_style "Uping workspace container\n" "warning"
-    docker-compose up -d workspace
-
-elif [ "$1" == "sw" ]; then
-    print_style "Stoping workspace container\n" "warning"
-    docker-compose stop workspace
 
 else
     print_style "Invalid arguments.\n" "danger"
