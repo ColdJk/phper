@@ -497,6 +497,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+    volumes:
+      - ./docker.sock:/var/run/docker.sock
+    networks:
+      - backend
 
   ### Laravel Echo Server #######################################
 #  laravel-echo-server:

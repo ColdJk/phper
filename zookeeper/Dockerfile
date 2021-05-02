@@ -1,10 +1,10 @@
-FROM zookeeper:latest
+FROM wurstmeister/zookeeper:latest
 
 LABEL maintainer="Hyduan <hyduan96@qq.com>"
 
-VOLUME /data
-VOLUME /datalog
+#VOLUME /data
+#VOLUME /datalog
 
 EXPOSE 2181
 
-CMD ["zkServer.sh", "start-foreground"]
+#CMD ["zkServer.sh", "start-foreground"]

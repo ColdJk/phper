@@ -111,6 +111,10 @@ elif [ "$1" == "l" ]; then
     print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
     docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
 
+elif [ "$1" == "ka" ]; then
+    print_style "Uping zookeeper kafka\n" "info"
+    docker-compose up -d zookeeper kafka
+
 elif [ "$1" == "um" ]; then
     print_style "Uping mysql container\n" "warning"
     docker-compose up -d mysql
