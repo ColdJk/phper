@@ -128,7 +128,7 @@ elif [ "$1" == "elk" ]; then
 
 elif [ "$1" == "l" ]; then
     print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
-    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
+    docker-compose up -d redis mariadb php-worker php-fpm nginx phpmyadmin
 
 elif [ "$1" == "ka" ]; then
     print_style "Uping zookeeper kafka\n" "info"
