@@ -188,10 +188,12 @@ ARG INSTALL_XSL=false
 ARG PHP_VERSION=${DOCKER_PHP_VERSION}
 
 RUN set -eux; \
+    apt-get update -yqq; \
     ###########################################################################
     # BZ2:
     ###########################################################################
     if [ ${INSTALL_BZ2} = true ]; then \
+
       apt-get -yqq install php${DOCKER_PHP_VERSION}-bz2; \
     fi; \
     ###########################################################################
@@ -266,6 +268,7 @@ RUN set -eux; \
 # PHP Swoole EXTENSION:
 ###########################################################################
 
+COPY ./swoole-src-master.tar.gz /tmp/swoole-src.tar.gz
 USER root
 
 ARG INSTALL_SWOOLE=false
@@ -281,7 +284,7 @@ RUN  if [ ${INSTALL_SWOOLE} = true ]; then \
     elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70100" ]; then \
       curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/refs/tags/v4.5.11.tar.gz -L; \
     else \
-      curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/master.tar.gz -L; \
+      mv /tmp/swoole-src.tar.gz /tmp/swoole.tar.gz; \
     fi; \
     tar zxvf ./tmp/swoole.tar.gz && \
     mv swoole* swoole-src && \
