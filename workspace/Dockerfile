@@ -701,7 +701,7 @@ RUN if [ ${INSTALL_PNPM} = true ]; then \
 ###########################################################################
 # YARN:
 ###########################################################################
-
+COPY ./yarn_install.sh ./tmp/yarn_install.sh
 USER phper
 
 ARG INSTALL_YARN=false
@@ -711,7 +711,7 @@ ENV YARN_VERSION ${YARN_VERSION}
 RUN if [ ${INSTALL_YARN} = true ]; then \
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
     if [ ${YARN_VERSION} = "latest" ]; then \
-        curl -o- -L https://yarnpkg.com/install.sh | bash; \
+        bash ./tmp/yarn_install.sh; \
     else \
         curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version ${YARN_VERSION}; \
     fi && \
