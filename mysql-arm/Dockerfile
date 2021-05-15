@@ -1,0 +1,21 @@
+ARG MYSQL_VERSION
+
+FROM mysql/mysql-server:${MYSQL_VERSION}
+
+LABEL maintainer="coldjk <https://coldjk.github.io>"
+
+#####################################
+# Set Timezone
+#####################################
+
+ARG TZ=PRC
+ENV TZ ${TZ}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && chown -R mysql:root /var/lib/mysql/
+
+COPY my.cnf /etc/mysql/conf.d/my.cnf
+
+RUN chmod 0444 /etc/mysql/conf.d/my.cnf
+
+CMD ["mysqld"]
+
+EXPOSE 3306
