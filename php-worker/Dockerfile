@@ -337,15 +337,29 @@ RUN if [ ${INSTALL_REDIS} = true ]; then \
     docker-php-ext-enable redis \
 ;fi
 
-# Swoole EXTENSION
+
+###########################################################################
+# PHP Swoole EXTENSION:
+###########################################################################
+
+COPY ./swoole-src-master.tar.gz /tmp/swoole-src.tar.gz
 USER root
+
 ARG INSTALL_SWOOLE=false
+
 # 编译安装 可自定义参数 例如openssl支持
 RUN  if [ ${INSTALL_SWOOLE} = true ]; then \
-    docker-php-ext-install sockets && \
     cd / && \
-    rm -rf ./swoole-src && \
-    curl -o ./tmp/swoole.tar.gz https://gitee.com/swoole/swoole/repository/archive/v4.5.11?format=tar.gz -L && \
+    rm -rf ./tmp/swoole-src && \
+    if   [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "50600" ]; then \
+      curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/refs/tags/v2.0.10.tar.gz -L; \
+    elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70000" ]; then \
+      curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/refs/tags/v4.3.5.tar.gz -L; \
+    elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70200" ]; then \
+      curl -o ./tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/refs/tags/v4.5.11.tar.gz -L; \
+    else \
+      mv /tmp/swoole-src.tar.gz /tmp/swoole.tar.gz; \
+    fi; \
     tar zxvf ./tmp/swoole.tar.gz && \
     mv swoole* swoole-src && \
     cd swoole-src && \
@@ -359,6 +373,7 @@ RUN  if [ ${INSTALL_SWOOLE} = true ]; then \
     && echo "swoole.use_shortname = off" >> /usr/local/etc/php/conf.d/php.ini \
     && rm -rf /swoole-src \
 ;fi
+
 
 # Taint EXTENSION
 ARG INSTALL_TAINT=false
