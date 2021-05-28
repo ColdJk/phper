@@ -122,6 +122,15 @@ elif [ "$1" == "ws" ]; then
 
 
 # 套餐容器
+
+elif [ "$1" == "l" ]; then
+    print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
+    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
+
+elif [ "$1" == "ls" ]; then
+    print_style "Stoping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
+    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
+
 elif [ "$1" == "elk" ]; then
     print_style "Uping elk containers\n" "info"
     docker-compose up -d elasticsearch kibana
@@ -130,10 +139,6 @@ elif [ "$1" == "elks" ]; then
     print_style "Stoping elk containers\n" "info"
     docker-compose stop elasticsearch kibana
 
-elif [ "$1" == "l" ]; then
-    print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
-    docker-compose up -d redis mysql php-worker php-fpm nginx phpmyadmin
-
 elif [ "$1" == "mo" ]; then
     print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
     docker-compose up -d mongo
@@ -141,10 +146,6 @@ elif [ "$1" == "mo" ]; then
 elif [ "$1" == "mos" ]; then
     print_style "Uping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
     docker-compose up -d mongo
-
-elif [ "$1" == "ls" ]; then
-    print_style "Stoping redis mysql php-worker php-fpm nginx phpmyadmin\n" "info"
-    docker-compose up -d redis mariadb php-worker php-fpm nginx phpmyadmin
 
 elif [ "$1" == "ka" ]; then
     print_style "Uping zookeeper kafka\n" "info"
