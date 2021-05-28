@@ -7,17 +7,21 @@ networks:
     driver: ${NETWORKS_DRIVER}
 
 volumes:
+  docker-in-docker:
+    driver: ${VOLUMES_DRIVER}
   mariadb:
     driver: ${VOLUMES_DRIVER}
   mysql:
     driver: ${VOLUMES_DRIVER}
   redis:
     driver: ${VOLUMES_DRIVER}
+  memcached:
+    driver: ${VOLUMES_DRIVER}
+  mongo:
+    driver: ${VOLUMES_DRIVER}
   elasticsearch:
     driver: ${VOLUMES_DRIVER}
-  adminer:
-    driver: ${VOLUMES_DRIVER}
-  docker-in-docker:
+  phpmyadmin:
     driver: ${VOLUMES_DRIVER}
 
 services:
@@ -293,7 +297,7 @@ services:
       - frontend
       - backend
 
-  ### MySQL ################################################
+#  ### MySQL ################################################
 #  mysql:
 #    build:
 #      context: ./mysql
@@ -333,7 +337,7 @@ services:
     networks:
       - backend
 
-  ### MariaDB ##############################################
+  # ### MariaDB ##############################################
   # mariadb:
   #   build:
   #     context: ./mariadb
@@ -367,34 +371,15 @@ services:
     networks:
       - backend
 
-#  ### Redis Cluster ##########################################
-#  redis-cluster:
-#    build: ./redis-cluster
-#    ports:
-#      - "${REDIS_CLUSTER_PORT_RANGE}:7000-7005"
-#    networks:
-#      - backend
+  #  ### Redis Cluster ##########################################
+  #  redis-cluster:
+  #    build: ./redis-cluster
+  #    ports:
+  #      - "${REDIS_CLUSTER_PORT_RANGE}:7000-7005"
+  #    networks:
+  #      - backend
 
-  ### phpMyAdmin ###########################################
-  phpmyadmin:
-    build: ./phpmyadmin
-    environment:
-      - PMA_ARBITRARY=1
-      - MYSQL_USER=${PMA_USER}
-      - MYSQL_PASSWORD=${PMA_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${PMA_ROOT_PASSWORD}
-      - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
-      - MEMORY_LIMIT=${PMA_MEMORY_LIMIT}
-      - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT}
-    ports:
-      - "${PMA_PORT}:80"
-    depends_on:
-      - "${PMA_DB_ENGINE}"
-    networks:
-      - frontend
-      - backend
-
-  ### REDISWEBUI ################################################
+  # ### REDISWEBUI ################################################
   #   redis-webui:
   #     build:
   #       context: ./redis-webui
@@ -439,6 +424,20 @@ services:
       - frontend
       - backend
 
+  ### Kibana ##############################################
+  kibana:
+    build:
+      context: ./kibana
+      args:
+        - ELK_VERSION=${ELK_VERSION}
+    ports:
+      - "${KIBANA_HTTP_PORT}:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - frontend
+      - backend
+
   ### Logstash ##############################################
   logstash:
     build:
@@ -460,22 +459,6 @@ services:
     depends_on:
       - elasticsearch
 
-
-
-  ### Kibana ##############################################
-  kibana:
-    build:
-      context: ./kibana
-      args:
-        - ELK_VERSION=${ELK_VERSION}
-    ports:
-      - "${KIBANA_HTTP_PORT}:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - frontend
-      - backend
-
   ### MongoDB ##############################################
   mongo:
     build: ./mongo
@@ -487,19 +470,19 @@ services:
     networks:
       - backend
 
-#  ### Memcached ############################################
-#  memcached:
-#    build: ./memcached
-#    volumes:
-#      - ${DATA_PATH_HOST}/memcached:/var/lib/memcached
-#    ports:
-#      - "${MEMCACHED_HOST_PORT}:11211"
-#    depends_on:
-#      - php-fpm
-#    networks:
-#      - backend
-#
-  ### RabbitMQ #############################################
+  #  ### Memcached ############################################
+  #  memcached:
+  #    build: ./memcached
+  #    volumes:
+  #      - ${DATA_PATH_HOST}/memcached:/var/lib/memcached
+  #    ports:
+  #      - "${MEMCACHED_HOST_PORT}:11211"
+  #    depends_on:
+  #      - php-fpm
+  #    networks:
+  #      - backend
+
+  # ### RabbitMQ #############################################
   rabbitmq:
     build: ./rabbitmq
     ports:
@@ -550,31 +533,50 @@ services:
     networks:
       - backend
 
-  ### Laravel Echo Server #######################################
-#  laravel-echo-server:
-#    build:
-#      context: ./laravel-echo-server
-#      args:
-#        - CHANGE_SOURCE=${CHANGE_SOURCE}
-#    volumes:
-#      - ./laravel-echo-server/laravel-echo-server.json:/app/laravel-echo-server.json:ro
-#    ports:
-#      - "${LARAVEL_ECHO_SERVER_PORT}:6001"
-#    links:
-#      - redis
-#    networks:
-#      - frontend
-#      - backend
+  # ### Laravel Echo Server #######################################
+  #  laravel-echo-server:
+  #    build:
+  #      context: ./laravel-echo-server
+  #      args:
+  #        - CHANGE_SOURCE=${CHANGE_SOURCE}
+  #    volumes:
+  #      - ./laravel-echo-server/laravel-echo-server.json:/app/laravel-echo-server.json:ro
+  #    ports:
+  #      - "${LARAVEL_ECHO_SERVER_PORT}:6001"
+  #    links:
+  #      - redis
+  #    networks:
+  #      - frontend
+  #      - backend
 
-#  ### Certbot #########################################
-#  certbot:
-#    build:
-#      context: ./certbot
-#    volumes:
-#      - ./data/certbot/certs/:/var/certs
-#      - ./certbot/letsencrypt/:/var/www/letsencrypt
-#    environment:
-#      - CN="lumen.test"
-#      - EMAIL="913265895@qq.com"
-#    networks:
-#      - frontend
+  # #### Certbot #########################################
+  #  certbot:
+  #    build:
+  #      context: ./certbot
+  #    volumes:
+  #      - ./data/certbot/certs/:/var/certs
+  #      - ./certbot/letsencrypt/:/var/www/letsencrypt
+  #    environment:
+  #      - CN="lumen.test"
+  #      - EMAIL="913265895@qq.com"
+  #    networks:
+  #      - frontend
+
+  # ### phpMyAdmin ###########################################
+  # phpmyadmin:
+  #   build: ./phpmyadmin
+  #   environment:
+  #     - PMA_ARBITRARY=1
+  #     - MYSQL_USER=${PMA_USER}
+  #     - MYSQL_PASSWORD=${PMA_PASSWORD}
+  #     - MYSQL_ROOT_PASSWORD=${PMA_ROOT_PASSWORD}
+  #     - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
+  #     - MEMORY_LIMIT=${PMA_MEMORY_LIMIT}
+  #     - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT}
+  #   ports:
+  #     - "${PMA_PORT}:80"
+  #   depends_on:
+  #     - "${PMA_DB_ENGINE}"
+  #   networks:
+  #     - frontend
+  #     - backend
