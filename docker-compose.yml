@@ -496,8 +496,6 @@ services:
     hostname: docker-rabbitmq
     volumes:
       - ${DATA_PATH_HOST}/rabbitmq:/var/lib/rabbitmq
-    depends_on:
-      - php-fpm
     networks:
       - backend
 
@@ -580,3 +578,14 @@ services:
   #   networks:
   #     - frontend
   #     - backend
+
+
+  # ### portainer  ###########################################
+#  portainer:
+#    image: portainer/portainer
+#    ports:
+#      - "9002:9002"
+#    restart: on-failure
+#    volumes:
+#      - ./docker.sock:/var/run/docker.sock
+#      - ${DATA_PATH_HOST}/portainer:/data
