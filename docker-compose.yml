@@ -526,10 +526,20 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
-    volumes:
-      - ./docker.sock:/var/run/docker.sock
     networks:
       - backend
+
+  ### portainer  ###########################################
+  portainer:
+    image: portainer/portainer
+    ports:
+      - "9902:9002"
+      - "9900:9000"
+    restart: on-failure
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DATA_PATH_HOST}/portainer:/data
+
 
   # ### Laravel Echo Server #######################################
   #  laravel-echo-server:
@@ -580,12 +590,3 @@ services:
   #     - backend
 
 
-  # ### portainer  ###########################################
-#  portainer:
-#    image: portainer/portainer
-#    ports:
-#      - "9002:9002"
-#    restart: on-failure
-#    volumes:
-#      - ./docker.sock:/var/run/docker.sock
-#      - ${DATA_PATH_HOST}/portainer:/data

@@ -28,18 +28,34 @@ display_options () {
     print_style "   start [services]" "info"; printf "\t Start Docker Compose.\n"
     print_style "   restart [services]" "info"; printf "\t Restart Docker Compose.\n"
     print_style "   stop [services]" "info"; printf "\t Stop containers.\n"
-    print_style "   ps" "info"; printf "\t\t\t Ps containers.\n"
+    print_style "   rm [service]" "warning"; printf "\t Remove container.\n"
     print_style "   log [services]" "info"; printf "\t Logs container.\n"
+    print_style "   ps" "info"; printf "\t\t\t Ps containers.\n"
+
+
+    printf "\n"
     print_style "   bash [service]" "info"; printf "\t Exec Docker Compose with bash.\n"
     print_style "   sh [service]" "info"; printf "\t\t Exec Docker Compose with sh.\n"
-    print_style "   l" "info"; printf "\t\t\t Up basic containers.\n"
-    print_style "   elk" "info"; printf "\t\t\t Up elk containers.\n"
-    print_style "   um" "info"; printf "\t\t\t Up mysql containers.\n"
-    print_style "   sm" "info"; printf "\t\t\t Stop mysql containers.\n"
-    print_style "   uw" "info"; printf "\t\t\t Up workspace containers.\n"
-    print_style "   sw" "info"; printf "\t\t\t Stop workspace containers.\n"
     print_style "   user" "info"; printf "\t\t\t Open bash on the workspace with user phper.\n"
     print_style "   root" "info"; printf "\t\t\t Open bash on the workspace with root.\n"
+
+    printf "\n"
+    print_style "   l" "info"; printf "\t\t\t Up lnmpr containers.\n"
+    print_style "   ls" "info"; printf "\t\t\t Stop lnmpr containers.\n"
+    print_style "   elk" "info"; printf "\t\t\t Up elk containers.\n"
+    print_style "   elks" "info"; printf "\t\t\t Stop elk containers.\n"
+    print_style "   ka" "info"; printf "\t\t\t Up kafka zookeeper container.\n"
+    print_style "   kas" "info"; printf "\t\t\t Stop kafka zookeeper container.\n"
+
+    printf "\n"
+    print_style "   m" "info"; printf "\t\t\t Up mysql container.\n"
+    print_style "   ms" "info"; printf "\t\t\t Stop mysql container.\n"
+    print_style "   w" "info"; printf "\t\t\t Up workspace container.\n"
+    print_style "   ws" "info"; printf "\t\t\t Stop workspace container.\n"
+    print_style "   mo" "info"; printf "\t\t\t Up mongo container.\n"
+    print_style "   mos" "info"; printf "\t\t\t Stop mongo container.\n"
+    print_style "   pc" "info"; printf "\t\t\t Up portainer container.\n"
+    print_style "   pcs" "info"; printf "\t\t\t Stop portainer container.\n"
 }
 
 if [[ $# -eq 0 ]] ; then
@@ -65,6 +81,10 @@ elif [ "$1" == "build" ] ; then
 elif [ "$1" == "stop" ]; then
     print_style "Stopping Docker Compose\n" "warning"
     docker-compose stop
+
+elif [ "$1" == "rm" ]; then
+    print_style "Removing Docker Compose, Check your dependence container. \n" "warning"
+    docker-compose stop $2 && docker-compose rm -f  $2
 
 elif [ "$1" == "down" ]; then
     print_style "Downing Docker Compose\n" "warning"
@@ -104,7 +124,7 @@ elif [ "$1" == "user" ]; then
 elif [ "$1" == "root" ]; then
     print_style "Execing workspace with root user\n" "info"
     docker-compose exec workspace bash
-elif [ "$1" == "mu" ]; then
+elif [ "$1" == "m" ]; then
     print_style "Uping mysql container\n" "warning"
     docker-compose up -d mysql
 
@@ -112,13 +132,29 @@ elif [ "$1" == "ms" ]; then
     print_style "Stoping mysql container\n" "warning"
     docker-compose stop mysql
 
-elif [ "$1" == "wu" ]; then
+elif [ "$1" == "w" ]; then
     print_style "Uping workspace container\n" "warning"
     docker-compose up -d workspace
 
 elif [ "$1" == "ws" ]; then
     print_style "Stoping workspace container\n" "warning"
     docker-compose stop workspace
+
+elif [ "$1" == "mo" ]; then
+    print_style "Uping mongo \n" "info"
+    docker-compose up -d mongo
+
+elif [ "$1" == "mos" ]; then
+    print_style "Stop mongo \n" "info"
+    docker-compose stop mongo
+
+elif [ "$1" == "pc" ]; then
+    print_style "Uping portainer \n" "info"
+    docker-compose up -d portainer
+
+elif [ "$1" == "pcs" ]; then
+    print_style "Stop portainer \n" "info"
+    docker-compose stop portainer
 
 
 # 套餐容器
@@ -138,14 +174,6 @@ elif [ "$1" == "elk" ]; then
 elif [ "$1" == "elks" ]; then
     print_style "Stoping elk containers\n" "info"
     docker-compose stop elasticsearch kibana logstash
-
-elif [ "$1" == "mo" ]; then
-    print_style "Uping mongo \n" "info"
-    docker-compose up -d mongo
-
-elif [ "$1" == "mos" ]; then
-    print_style "Stop mongo \n" "info"
-    docker-compose stop mongo
 
 elif [ "$1" == "ka" ]; then
     print_style "Uping zookeeper kafka\n" "info"
